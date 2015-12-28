@@ -24,6 +24,7 @@ import collection.mutable.{MultiMap, HashMap}
 import TypeFilterList._
 import org.kiama.rewriting.Rewriter
 import Rewriter._
+import org.kiama.rewriting.Strategy
 import annotation.tailrec
 
 /**
@@ -52,12 +53,12 @@ object AbstractSyntax {
   /** Strategies to rewrite 'm' to MODULES **/
 
   // Fail if we detect an equality / inequality
-  val sModEq = strategy {
+  val sModEq = strategy[BinaryOp] {
     case Eq(Mod, _) | Eq(_,Mod) | NEq(Mod, _) | NEq(_,Mod) => None
     case x => Some(x)
   }
 
-  val sMod = rule {
+  val sMod = rule[IdOrValue] {
     case Mod => Id("MODULES")
   }
 
@@ -83,7 +84,7 @@ object AbstractSyntax {
       val mutMap = new HashMap[String, collection.mutable.Set[KExpr]]
               with MultiMap[String, KExpr]
       Rewriter.everywheretd {
-        Rewriter.query {
+        Rewriter.query[CConfig] {
           case CConfig(_,name,_,_,_,_,_,sels,_,_,_,_) =>
             sels.map { case Select(n,e) => (n, Id(name) && e) }.foreach {
               case (k,v) => mutMap addBinding (k,v)
@@ -147,7 +148,7 @@ object AbstractSyntax {
       // Push choice visibility down to the choice members
       val withChoiceVis =
         everywheretd {
-          rule {
+          rule[CChoice] {
             case x@CChoice(_, Prompt(_, vis), _, _, _,_, children) =>
               x.copy (cs = children map {
                 case config => config.copy(prompt = config.prompt map {
@@ -159,7 +160,7 @@ object AbstractSyntax {
 
       val withChoiceDeps =
         everywheretd {
-          rule {
+          rule[CChoice] {
             case x@CChoice(_, _, _, _, _, deps, children) =>
               x.copy (cs = children map {
                 case config => config.copy(depends = config.depends ::: deps)
