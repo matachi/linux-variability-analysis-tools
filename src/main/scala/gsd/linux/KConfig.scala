@@ -95,7 +95,7 @@ case class AbstractKConfig(configs: List[AConfig] = Nil,
     (identifiers.toList.zipWithIndex map { case (name, i) => (name, i+1) }).toMap
 
 
-  val sDefault: Term => List[List[(String, KExpr)]] = collectl {
+  val sDefault: Any => List[List[(String, KExpr)]] = collectl {
     case c: AConfig if
     c.ktype == KStringType ||
       c.ktype == KIntType ||
@@ -133,7 +133,7 @@ object AbstractKConfig {
   implicit def fromConcreteKConfig(k: ConcreteKConfig): AbstractKConfig =
     k.toAbstractKConfig
 
-  def identifiers(in: Term): Set[String] =
+  def identifiers(in: Any): Set[String] =
     collects {
       case c: AConfig => c.name
       case Id(n) => n
