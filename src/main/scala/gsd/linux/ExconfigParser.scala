@@ -160,7 +160,7 @@ class ExconfigParser extends KExprParser with ImplicitConversions {
     }
     rewrite {
       everywheretd {
-        rule {
+        rule[CSymbol] {
           case s: CMenu => s.copy(nId = nextId)
           case s: CConfig => s.copy(nId = nextId)
           case s: CChoice => s.copy(nId = nextId)

@@ -23,6 +23,8 @@ import collection.mutable.{MultiMap, HashMap}
 
 import TypeFilterList._
 import org.kiama.rewriting.Rewriter
+import Rewriter._
+import org.kiama.rewriting.Strategy
 
 /**
  * @author Steven She (shshe@gsd.uwaterloo.ca)
@@ -64,7 +66,7 @@ object AbstractSyntax {
       val mutMap = new HashMap[String, collection.mutable.Set[KExpr]]
               with MultiMap[String, KExpr]
       Rewriter.everywheretd {
-        Rewriter.query {
+        Rewriter.query[CConfig] {
           case CConfig(_,name,_,_,_,_,_,sels,_,_,_) =>
             sels.map { case Select(n,e) => (n, Id(name) && e) }.foreach {
               case (k,v) => mutMap addBinding (k,v)

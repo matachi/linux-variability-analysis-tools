@@ -38,7 +38,7 @@ object ASEStatistics {
       }
 
     lazy val fixHex =
-      rule {
+      rule[IdOrValue] {
         case Id(x) if isHex(x) && !ck.configMap.contains(x) =>
           KInt(Integer.parseInt(x, 16))
       }
@@ -60,7 +60,7 @@ object ASEStatistics {
       : ConcreteKConfig = {
     val strategy =
       everywheretd {
-        rule {
+        rule[CConfig] {
           case config@CConfig(_,_,_,_,inh,pros,ds,selects,rngs,_,_) =>
             config.copy (
               prompt = pros map
